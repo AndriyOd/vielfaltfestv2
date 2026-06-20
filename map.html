@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8" />
     <title>Live Map</title>
-
     <style>
         body {
             margin: 0;
@@ -19,132 +18,141 @@
             margin-bottom: 20px;
         }
 
-        svg {
-            width: 100%;
-            height: 500px;
-            background: #1a1a1a;
-            border-radius: 10px;
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 800px;
         }
 
-        .district-label {
-            font-size: 14px;
-            fill: white;
-            pointer-events: none;
+        .district {
+            /*background: #2a2a2a;
+            padding: 10px;
+            border-radius: 8px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #444;
+            overflow-y: auto;*/
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 8px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #444;
+            /* Флаги будут выстраиваться красиво в ряд */
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 5px;
+        }
+
+        .district h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #aaa;
+            width: 100%;
+            /* ЭТО КЛЮЧЕВОЕ ИЗМЕНЕНИЕ */
+            flex: 0 0 100%;
+            /* Дополнительная гарантия того, что заголовок не будет сжиматься */
         }
 
         .flag {
             font-size: 20px;
+            /*display: inline-block;
+            margin: 2px;
+            display: flex;*/
         }
     </style>
 </head>
 
 <body>
 
-    <div class="counter">
-        Всего гостей: <span id="count">0</span>
+    <div class="counter">Всего гостей: <span id="count">0</span></div>
+
+    <div class="map-grid">
+        <div id="North" class="district">
+            <h3>North</h3>
+        </div>
+        <div id="West" class="district">
+            <h3>West</h3>
+        </div>
+        <div id="Center" class="district">
+            <h3>Center</h3>
+        </div>
+        <div id="East" class="district">
+            <h3>East</h3>
+        </div>
+        <div id="South" class="district">
+            <h3>South</h3>
+        </div>
     </div>
-
-    <svg viewBox="0 0 500 300">
-
-        <rect id="North" x="150" y="20" width="200" height="60" fill="#2a2a2a" />
-        <text x="170" y="55" class="district-label">North</text>
-
-        <rect id="West" x="20" y="100" width="200" height="80" fill="#2a2a2a" />
-        <text x="40" y="145" class="district-label">West</text>
-
-        <rect id="Center" x="150" y="100" width="200" height="80" fill="#2a2a2a" />
-        <text x="170" y="145" class="district-label">Center</text>
-
-        <rect id="East" x="360" y="100" width="120" height="80" fill="#2a2a2a" />
-        <text x="375" y="145" class="district-label">East</text>
-
-        <rect id="South" x="150" y="200" width="200" height="70" fill="#2a2a2a" />
-        <text x="170" y="240" class="district-label">South</text>
-
-    </svg>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2TQLu_O5U-Jjxj1ArV4Cn79mtjp9cI9k",
-            authDomain: "vielfaltfestv2.firebaseapp.com",
-            projectId: "vielfaltfestv2",
-            storageBucket: "vielfaltfestv2.firebasestorage.app",
-            messagingSenderId: "657334897151",
-            appId: "1:657334897151:web:f1651bca7dc22f250d3fca"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const guestsRef = collection(db, "guests");
-
-        // Словарь для связи альфа-3 и альфа-2
         let alpha3ToAlpha2 = {};
 
-        function flagFromAlpha2(alpha2) {
-            return alpha2
-                .toUpperCase()
-                .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt()));
+        function flagFromAlpha2(a2) {
+            return String.fromCodePoint(...[...a2.toUpperCase()].map(c => c.charCodeAt(0) + 127397));
         }
 
-        // 1. Загружаем данные из JSON и строим словарь
         async function init() {
             try {
                 const response = await fetch('countries.json');
                 const countries = await response.json();
-
-                // Превращаем массив объектов в удобный словарь { "DEU": "DE", ... }
-                countries.forEach(c => {
-                    alpha3ToAlpha2[c.alpha3] = c.alpha2;
-                });
-
-                // 2. Только после загрузки стран запускаем слушатель Firebase
-                startApp();
-            } catch (e) {
-                console.error("Ошибка загрузки стран:", e);
-            }
+                countries.forEach(c => alpha3ToAlpha2[c.alpha3] = c.alpha2);
+                startFirebase();
+            } catch (e) { console.error("Ошибка загрузки стран:", e); }
         }
 
-        function startApp() {
-            onSnapshot(guestsRef, (snapshot) => {
+        function startFirebase() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyB2TQLu_O5U-Jjxj1ArV4Cn79mtjp9cI9k",
+                authDomain: "vielfaltfestv2.firebaseapp.com",
+                projectId: "vielfaltfestv2",
+                storageBucket: "vielfaltfestv2.firebasestorage.app",
+                messagingSenderId: "657334897151",
+                appId: "1:657334897151:web:f1651bca7dc22f250d3fca"
+            };
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            onSnapshot(query(collection(db, "guests"), orderBy("createdAt", "asc")), (snapshot) => {
                 const guests = snapshot.docs.map(doc => doc.data());
                 document.getElementById("count").innerText = guests.length;
 
-                document.querySelectorAll(".flag").forEach(el => el.remove());
+                document.querySelectorAll(".district").forEach(d => {
+                    const title = d.querySelector("h3");
+                    d.innerHTML = ""; d.appendChild(title);
+                });
 
-                const districtCounters = { North: 0, South: 0, East: 0, West: 0, Center: 0 };
+                /*const lastGuest = guests[guests.length - 1];*/
 
-                guests.forEach(g => {
-                    const district = document.getElementById(g.district);
-                    if (!district) return;
+                // 2. Просто проходим по списку и добавляем флаги один за другим
+                // Поскольку массив guests уже отсортирован по createdAt, 
+                // порядок добавления сохранится автоматически.
+                guests.forEach((g) => {
+                    const districtEl = document.getElementById(g.district);
+                    if (!districtEl) return;
 
                     const alpha2 = alpha3ToAlpha2[g.country];
                     if (!alpha2) return;
 
-                    const flag = flagFromAlpha2(alpha2);
-                    const index = districtCounters[g.district]++;
-                    const col = index % 8;
-                    const row = Math.floor(index / 8);
+                    const span = document.createElement("span");
+                    span.className = "flag";
+                    span.textContent = flagFromAlpha2(alpha2);
 
-                    const startX = Number(district.getAttribute("x")) + 10;
-                    const startY = Number(district.getAttribute("y")) + 25;
-
-                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    text.setAttribute("x", startX + col * 22);
-                    text.setAttribute("y", startY + row * 24);
-                    text.setAttribute("class", "flag");
-                    text.textContent = flag;
-                    district.parentNode.appendChild(text);
+                    districtEl.appendChild(span);
                 });
             });
         }
 
-        // Запускаем процесс
         init();
     </script>
-
+    <a href="index.html">Back</a>
 </body>
 
 </html>
