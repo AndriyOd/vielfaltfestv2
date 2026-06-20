@@ -1,0 +1,62 @@
+[
+    {
+        "alpha3": "DEU",
+        "alpha2": "DE",
+        "de": "Deutschland",
+        "en": "Germany"
+    },
+    {
+        "alpha3": "UKR",
+        "alpha2": "UA",
+        "de": "Ukraine",
+        "en": "Ukraine"
+    },
+    {
+        "alpha3": "POL",
+        "alpha2": "PL",
+        "de": "Polen",
+        "en": "Poland"
+    },
+    {
+        "alpha3": "FRA",
+        "alpha2": "FR",
+        "de": "Frankreich",
+        "en": "France"
+    },
+    {
+        "alpha3": "ITA",
+        "alpha2": "IT",
+        "de": "Italien",
+        "en": "Italy"
+    },
+    {
+        "alpha3": "ESP",
+        "alpha2": "ES",
+        "de": "Spanien",
+        "en": "Spain"
+    },
+    {
+        "alpha3": "NLD",
+        "alpha2": "NL",
+        "de": "Niederlande",
+        "en": "Netherlands"
+    },
+    {
+        "alpha3": "USA",
+        "alpha2": "US",
+        "de": "Vereinigte Staaten",
+        "en": "United States"
+    },
+    {
+        "alpha3": "TUR",
+        "alpha2": "TR",
+        "de": "Türkei",
+        "en": "Turkey"
+    },
+    {
+        "alpha3": "CHN",
+        "alpha2": "CN",
+        "de": "China",
+        "en": "China"
+    }
+]
