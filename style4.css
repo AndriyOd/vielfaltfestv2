@@ -1,0 +1,244 @@
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #ffffff;
+}
+
+/* Общий контейнер */
+.grid {
+    width: 97vw;
+    height: 95vh;
+
+    display: grid;
+
+    /* Ширины колонок */
+    grid-template-columns: 75% 25%;
+
+    /* Три строки по высотам правой колонки */
+    grid-template-rows: 10% 70% 20%;
+
+    gap: 0;
+}
+
+/* Общий стиль блоков */
+.grid>div {
+    border: 1px solid #d0d0d0;
+    box-sizing: border-box;
+    padding: 10px;
+    font-family: sans-serif;
+}
+
+/* Размещение блоков */
+
+#div1 {
+    grid-column: 1;
+    grid-row: 1;
+    background: #fff5f5;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#div2 {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+    /* занимает 70% + 20% = 90% */
+    /* background: #f5fff5; */
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+
+    position: relative;
+}
+
+#div3 {
+    grid-column: 2;
+    grid-row: 1;
+    background: #f5f5ff;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#div4 {
+    grid-column: 2;
+    grid-row: 2;
+    background: #fffbe6;
+    font-size: 15px;
+}
+
+#div5 {
+    grid-column: 2;
+    grid-row: 3;
+    background: #f8f0ff;
+}
+
+#map-container {
+    position: relative;
+    /* База для абсолютных районов */
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    /* Фиксируем пропорции карты */
+    background: #ffffff;
+    /* border: 1px solid #d0d0d0; */
+    display: flex;
+    justify-content: center;
+}
+
+svg {
+    height: 100%;
+}
+
+path {
+    /*fill: #3498db;*/
+    /*fill: #e8e8e9;*/
+    /*fill: #f2f2f3;*/
+    /*fill: #d4fce5;*/
+    fill: #fdeed9;
+}
+
+.district {
+    /*
+    font-size: 12px;
+    color: rgb(0, 0, 0);
+*/
+    /*
+    background: rgba(135, 168, 250, 0.1);
+
+    border: 2px dashed rgba(72, 72, 72, 0.5);
+    */
+    position: absolute;
+    padding: 1px;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    /*line-height: 1;*/
+    gap: 5px;
+}
+
+.flag {
+    font-size: 18px;
+    /*display: inline-block;*/
+    /*line-height: 1;*/
+    /*font-size: clamp(10px,3cqi,50px);*/
+    vertical-align: top;
+    /*margin: 2px;*/
+    display: flex;
+}
+
+#Eichen {
+    top: 12%;
+    left: 41%;
+    width: 26%;
+    height: 14%;
+}
+
+#Erbstadt {
+    top: 5%;
+    left: 15%;
+    width: 16%;
+    height: 17%;
+}
+
+#Heldenbergen {
+    top: 45%;
+    left: 10%;
+    width: 30%;
+    height: 13%;
+}
+
+#Ostheim {
+    top: 41%;
+    left: 52%;
+    width: 32%;
+    height: 25%;
+}
+
+#Windecken {
+    top: 73%;
+    left: 19%;
+    width: 28%;
+    height: 15%;
+}
+
+
+#Eichen-Title {
+    top: 15%;
+    left: 65%;
+}
+
+#Erbstadt-Title {
+    top: 8%;
+    left: 15%;
+}
+
+#Heldenbergen-Title {
+    top: 50%;
+    left: 6%;
+}
+
+#Ostheim-Title {
+    top: 60%;
+    left: 72%;
+}
+
+#Windecken-Title {
+    top: 80%;
+    left: 17%;
+}
+
+/* Специальный класс для места, где будет флаг */
+.placeholder {
+    visibility: hidden;
+    /* Место занято, но флаг не виден */
+    font-size: 20px;
+}
+
+/* Летящий флаг - он будет поверх всех */
+.flying-flag {
+    /*position: fixed;
+            z-index: 2000;
+            font-size: 50px;*/
+    /* Большой в начале */
+    /*pointer-events: none;
+            transition: all 5.0s cubic-bezier(0.2, 0.8, 0.2, 1);*/
+    position: fixed;
+    z-index: 2000;
+    font-size: 50px;
+    pointer-events: none;
+    transition: all 4.0s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Это подсказка браузеру, что элемент будет двигаться, уменьшит лаги */
+    will-change: top, left, transform;
+}
+
+.district-Title {
+    font-size: 17px;
+    color: rgb(0, 0, 0);
+    /*border: 2px dashed rgba(72, 72, 72, 0.5);*/
+    font-weight: bold;
+
+    position: absolute;
+    padding: 1px;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    /*line-height: 1;*/
+    gap: 8px;
+    width: fit-content;
+    white-space: nowrap;
+
+    z-index: 1;
+}
+
+.district-Title>img {
+    width: 1em;
+    height: 1em;
+}
+
