@@ -96,7 +96,7 @@ function startFirebase() {
                 setTimeout(() => {
                     if (flying) flying.remove();
                     placeholder.style.visibility = "visible"; // Флаг становится видимым точно там, где был летун
-                }, 4100);
+                }, 2100);
             } else {
                 // Обычный вывод
                 const span = document.createElement("span");
