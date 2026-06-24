@@ -212,7 +212,7 @@ path {
     z-index: 2000;
     font-size: 50px;
     pointer-events: none;
-    transition: all 4.0s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: all 2.0s cubic-bezier(0.2, 0.8, 0.2, 1);
     /* Это подсказка браузеру, что элемент будет двигаться, уменьшит лаги */
     will-change: top, left, transform;
 }
