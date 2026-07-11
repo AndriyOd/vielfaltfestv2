@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festival Registration</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+
+            font-family: sans-serif;
+            padding: 15px;
+            /* Чтобы элементы не прилипали к краям экрана */
+        }
+
+        /* 🧩 dropdown контейнер */
+        .dropdown {
+            position: relative;
+            width: 340px;
+
+            width: 100%;
+            /* Теперь контейнер подстраивается под экран */
+        }
+
+        /* 🔍 input */
+        .dropdown-input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* 📜 выпадающий список */
+        .dropdown-list {
+            position: absolute;
+            width: 100%;
+            background: white;
+            border: 1px solid #ccc;
+
+            /* 🔥 ключ: 5-6 элементов + scroll */
+            max-height: 180px;
+            overflow-y: auto;
+
+            display: none;
+            z-index: 10;
+        }
+
+        /* 📌 элемент списка */
+        .dropdown-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #eee;
+        }
+
+        /* Увеличиваем все поля ввода для удобства нажатия */
+        input,
+        select,
+        button {
+            width: 100%;
+            /* Растягиваем на всю ширину экрана */
+            padding: 15px;
+            /* Делаем выше, чтобы было удобно попадать пальцем */
+            font-size: 16px;
+            /* Предотвращает зум при нажатии (на iOS) */
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Herzlich willkommen!</h2>
+    <br><br>
+    <div>Teilen Sie uns bitte mit, woher Sie kommen.</div>
+        <br><br>
+
+    <!-- <input id="name" placeholder="Name" /> -->
+
+    <div class="dropdown">
+        <input id="countrySearch" class="dropdown-input" placeholder="Ich komme aus..." />
+        <div id="countryList" class="dropdown-list"></div>
+    </div>
+
+    <br><br>
+
+    <label for="district">Ich wohne in:</label>
+    <select id="district">
+        <option value="Eichen" selected>Eichen</option>
+        <option value="Erbstadt">Erbstadt</option>
+        <option value="Heldenbergen">Heldenbergen</option>
+        <option value="Ostheim">Ostheim</option>
+        <option value="Windecken">Windecken</option>
+        <option value="Woanders">Woanders</option>
+    </select>
+
+
+    <br><br>
+
+    <button onclick="saveGuest()">OK</button>
+
+    <p id="status"></p>
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2TQLu_O5U-Jjxj1ArV4Cn79mtjp9cI9k",
+            authDomain: "vielfaltfestv2.firebaseapp.com",
+            projectId: "vielfaltfestv2",
+            storageBucket: "vielfaltfestv2.firebasestorage.app",
+            messagingSenderId: "657334897151",
+            appId: "1:657334897151:web:f1651bca7dc22f250d3fca"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Переменная для хранения списка стран
+        let countries = [];
+
+        // Функция загрузки данных
+        async function loadCountries() {
+            try {
+                const response = await fetch('countries.json');
+                countries = await response.json();
+            } catch (e) {
+                console.error("Ошибка при загрузке списка стран:", e);
+            }
+        }
+
+        // Запускаем загрузку при старте
+        loadCountries();
+
+        // 🇺🇳 emoji-флаг
+        function flag(alpha2) {
+            return alpha2
+                .toUpperCase()
+                .replace(/./g, c =>
+                    String.fromCodePoint(127397 + c.charCodeAt())
+                );
+        }
+
+        // =====================
+        // 🔍 DROPDOWN LOGIC
+        // =====================
+        const search = document.getElementById("countrySearch");
+        const list = document.getElementById("countryList");
+        let selectedCountry = null;
+
+        function renderList(filter = "") {
+            list.innerHTML = "";
+            const filtered = countries.filter(c =>
+                (c.de + c.en + c.alpha3)
+                    .toLowerCase()
+                    .includes(filter.toLowerCase())
+            );
+
+            filtered.forEach(c => {
+                const div = document.createElement("div");
+                div.className = "dropdown-item";
+                div.textContent = `${flag(c.alpha2)} ${c.alpha3} — ${c.de} (${c.en})`;
+                div.onclick = () => {
+                    search.value = div.textContent;
+                    selectedCountry = c.alpha3;
+                    list.style.display = "none";
+                };
+                list.appendChild(div);
+            });
+
+            list.style.display = filtered.length ? "block" : "none";
+        }
+
+        // Обработчик input
+        search.addEventListener("input", () => renderList(search.value));
+
+        // Обработчик click для открытия/очистки
+        search.addEventListener("click", () => {
+            search.value = "";
+            selectedCountry = null;
+            renderList("");
+        });
+
+        // Закрытие при клике вне области
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".dropdown")) {
+                list.style.display = "none";
+            }
+        });
+
+        // =====================
+        // 💾 SAVE
+        // =====================
+        window.saveGuest = async function () {
+            //const name = document.getElementById("name").value;
+
+
+            const district = document.getElementById("district").value;
+
+            if (!selectedCountry) {
+                alert("Wählen Sie bitte ein Land aus der Liste");
+                return;
+            }
+
+            // Генерируем уникальное имя на основе текущего времени
+            const now = new Date();
+            const pad = (num) => String(num).padStart(2, '0');
+
+            const name = `guest-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+
+            try {
+                await addDoc(collection(db, "guests"), {
+                    name,
+                    country: selectedCountry,
+                    district,
+                    createdAt: new Date()
+                });
+                document.getElementById("status").innerText = "Gespeichert. Danke!";
+                // Опционально: очистить форму после успеха
+                //document.getElementById("name").value = "";
+                search.value = "";
+            } catch (e) {
+                console.error(e);
+                document.getElementById("status").innerText = "Fehler!";
+            }
+        };
+    </script>
+    <a href="map4.html">Map</a>
+</body>
+
+</html>

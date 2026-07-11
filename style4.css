@@ -25,7 +25,7 @@ body {
 
 /* Общий стиль блоков */
 .grid>div {
-    border: 1px solid #d0d0d0;
+    /*border: 1px solid #d0d0d0;*/
     box-sizing: border-box;
     padding: 10px;
     font-family: sans-serif;
@@ -36,11 +36,48 @@ body {
 #div1 {
     grid-column: 1;
     grid-row: 1;
-    background: #fff5f5;
+    /*background: #fff5f5;*/
+    /*background: #f5f5ff;*/
+    /*background: #e6e6fa;*/
+    background: #ededfa;
+    /*background: #fdeed9;*/
     display: flex;
+    justify-content: space-between;
     align-items: center;
+    font-size: 30px;
+    font-family: 'Roboto', Arial, sans-serif;
+    /*font-weight: bold;*/
+    border-bottom: 1px solid #d0d0d0;
+}
+
+#date {
     font-size: 20px;
-    font-weight: bold;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+#Nidderau-Title {
+    height: 100%;
+    width: auto;
+    font-size: 37px;
+    /*font-weight: bold;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*font-family: 'Roboto', Arial, sans-serif;*/
+    font-family: 'Montserrat', Arial, sans-serif;
+    letter-spacing: 0.25em;
+}
+
+#nidderau-logo-2 {
+    height: 100%;
+    width: auto;
+    margin-right: 1em;
+    opacity: 0.75;
+}
+
+#Fest-Title {
+    font-family: 'Montserrat', Arial, sans-serif;
+    /*letter-spacing: 0.1em;*/
 }
 
 #nidderau-logo {
@@ -62,25 +99,34 @@ body {
 #div3 {
     grid-column: 2;
     grid-row: 1;
-    background: #f5f5ff;
+    /*background: #f5f5ff;*/
+    background: #ededfa;
+    /*background:#fdeed9;*/
     display: flex;
+    justify-content: space-around;
     align-items: center;
-    font-size: 20px;
+    font-size: 30px;
     font-weight: bold;
+    font-family: 'Montserrat', Arial, sans-serif;
+    border-left: 1px solid #d0d0d0;
+    border-bottom: 1px solid #d0d0d0;
 }
 
 #div4 {
     grid-column: 2;
     grid-row: 2;
-    background: #fffbe6;
+    /*background: #fffbe6;*/
     font-size: 15px;
     padding: 0%;
+    border-left: 1px solid #d0d0d0;
+    border-bottom: 1px solid #d0d0d0;
 }
 
 #div5 {
     grid-column: 2;
     grid-row: 3;
-    background: #f8f0ff;
+    /*background: #f8f0ff;*/
+    /*background: #f5f5ff;*/
 
     display: flex;
     flex-direction: column;
@@ -88,6 +134,7 @@ body {
     justify-content: space-between;
     /* Распределяет место: текст вверху, картинка внизу */
     align-items: center;
+    border-left: 1px solid #d0d0d0;
 }
 
 
@@ -119,6 +166,11 @@ path {
     /*fill: #f2f2f3;*/
     /*fill: #d4fce5;*/
     fill: #fdeed9;
+    /*fill: #f5f5ff;*/
+    stroke: #000000;
+    /*stroke-width: 3.5896;*/
+    /*stroke-width: 0.75;*/
+    stroke-width: 1;
 }
 
 .district {
@@ -144,7 +196,9 @@ path {
 .flag {
     font-size: 18px;
     /*display: inline-block;*/
+
     /*line-height: 1;*/
+
     /*font-size: clamp(10px,3cqi,50px);*/
     vertical-align: top;
     /*margin: 2px;*/
@@ -194,12 +248,14 @@ path {
 
 #Erbstadt-Title {
     top: 8%;
-    left: 15%;
+    /*left: 15%;*/
+    left: 12%;
 }
 
 #Heldenbergen-Title {
     top: 50%;
-    left: 6%;
+    /*left: 6%;*/
+    left: 2%;
 }
 
 #Ostheim-Title {
@@ -209,14 +265,21 @@ path {
 
 #Windecken-Title {
     top: 80%;
-    left: 17%;
+    /*left: 17%;*/
+    left: 13%;
 }
 
 /* Специальный класс для места, где будет флаг */
 .placeholder {
-    visibility: hidden;
+    /*visibility: hidden;*/
+    opacity: 0;
     /* Место занято, но флаг не виден */
-    font-size: 20px;
+    font-size: 18px;
+
+    display: inline-block;
+    width: 18px;
+    /* Размер твоего флага */
+    height: 18px;
 }
 
 /* Летящий флаг - он будет поверх всех */
@@ -231,16 +294,16 @@ path {
     z-index: 2000;
     font-size: 50px;
     pointer-events: none;
-    transition: all 2.0s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /*transition: all 2.0s cubic-bezier(0.2, 0.8, 0.2, 1);*/
     /* Это подсказка браузеру, что элемент будет двигаться, уменьшит лаги */
     will-change: top, left, transform;
 }
 
 .district-Title {
-    font-size: 17px;
+    font-size: 25px;
     color: rgb(0, 0, 0);
     /*border: 2px dashed rgba(72, 72, 72, 0.5);*/
-    font-weight: bold;
+    /*font-weight: bold;*/
 
     position: absolute;
     padding: 1px;
@@ -254,11 +317,13 @@ path {
     white-space: nowrap;
 
     z-index: 1;
+    /*font-family: 'Roboto', Arial, sans-serif;*/
 }
 
 .district-Title>img {
     width: 1em;
     height: 1em;
+    opacity: 0.6;
 }
 
 .guest-list {
@@ -308,4 +373,69 @@ path {
     font-weight: bold;
     min-width: 30px;
     text-align: right;
+}
+
+#frame {
+    position: absolute;
+    height: fit-content;
+    width: fit-content;
+    top: 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /*background-color: #ededfa;*/
+    /*background-color: #ffffff7c;*/
+    background-color: #ffffff96;
+    /*border: gray 0.5px solid;*/
+    z-index: 2000;
+
+    visibility: hidden;
+}
+
+#w-frame {
+    width: 100%;
+    height: 30%;
+    top: 30%;
+}
+
+.willkommen {
+    font-size: 3.5em;
+    color: rgb(68, 68, 68);
+    font-weight: bold;
+
+    /*background-color: #ffffff7c;*/
+    /*border: gray 0.5px solid;*/
+
+    /*display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    width: fit-content;
+    white-space: nowrap;*/
+
+    /*z-index: 1;*/
+    /*font-family: 'Montserrat', Arial, sans-serif;*/
+    font-family: 'Montserrat', Arial, sans-serif;
+
+    /*position: absolute;
+    top: 25%;*/
+}
+
+.wCountry {
+    font-size: 2em;
+    color: rgb(68, 68, 68);
+    font-weight: bold;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.test-flag {
+    font-size: 7em;
+    /*border: black 0.5px solid;*/
+    z-index: 2;
+    /*margin: 0%;
+    padding: 0%;*/
+
+    /*position: absolute;*/
+    /*top: 37%;*/
+    /*transform: scale(3);*/
 }
