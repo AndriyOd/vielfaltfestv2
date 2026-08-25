@@ -1,0 +1,8 @@
+{
+  "name": "Festival Registration",
+  "short_name": "Festival",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff"
+}
