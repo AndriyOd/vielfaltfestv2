@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festival Registration</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+
+            font-family: sans-serif;
+            padding: 15px;
+            /* Чтобы элементы не прилипали к краям экрана */
+        }
+
+        /* 🧩 dropdown контейнер */
+        .dropdown {
+            position: relative;
+            width: 340px;
+
+            width: 100%;
+            /* Теперь контейнер подстраивается под экран */
+        }
+
+        /* 🔍 input */
+        .dropdown-input {
+            width: 100%;
+            padding: 18px; /* 10px */
+            font-size: 18px; /* didn't exist */
+            box-sizing: border-box;
+        }
+
+        /* 📜 выпадающий список */
+        .dropdown-list {
+            position: absolute;
+            width: 100%;
+            background: white;
+            border: 1px solid #ccc;
+
+            /* 🔥 ключ: 5-6 элементов + scroll */
+            max-height: 250px; /* 180px */
+            overflow-y: auto;
+
+            display: none;
+            z-index: 10;
+        }
+
+        /* 📌 элемент списка */
+        .dropdown-item {
+            padding: 14px 18px; /* 8px */
+            font-size: 18px; /* didn't exist */
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #eee;
+        }
+
+        /* Увеличиваем все поля ввода для удобства нажатия */
+        input,
+        select,
+        button {
+            width: 100%;
+            /* Растягиваем на всю ширину экрана */
+            padding: 18px; /* 15px */
+            /* Делаем выше, чтобы было удобно попадать пальцем */
+            font-size: 18px;  /* 16px */
+            /* Предотвращает зум при нажатии (на iOS) */
+            box-sizing: border-box;
+            margin-bottom: 12px; /* 10px */
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        /* 🔔 Кастомное модальное окно взамен системного alert() —
+           над ним у нас полный контроль (шрифт, текст), в отличие от
+           нативного alert(), где браузер сам дописывает служебную строку
+           с адресом страницы. */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-modal-overlay.visible {
+            display: flex;
+        }
+
+        .custom-modal-box {
+            background: white;
+            border-radius: 10px;
+            padding: 24px 20px;
+            max-width: 90%;
+            width: 340px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .custom-modal-message {
+            font-size: 20px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .custom-modal-box button {
+            margin-bottom: 0;
+        }
+
+        /* 🎉 Оверлей "Herzlich willkommen" — показывается после успешной
+           регистрации, тот же вид, что и на главном экране карты (map4.html):
+           заголовок, название страны, флаг — все три строки по центру. */
+        .welcome-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: #ffffffd9;
+            z-index: 3000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .welcome-overlay.visible {
+            display: flex;
+        }
+
+        .welcome-overlay .willkommen {
+            font-size: clamp(1.4rem, 6.5vw, 2.4rem);
+            color: rgb(68, 68, 68);
+            font-weight: bold;
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin-bottom: 14px;
+        }
+
+        .welcome-overlay .wCountry {
+            font-size: clamp(1.1rem, 5vw, 1.9rem);
+            color: rgb(68, 68, 68);
+            font-weight: bold;
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin-bottom: 14px;
+        }
+
+        .welcome-overlay .test-flag {
+            font-size: clamp(4rem, 24vw, 7.5rem);
+            line-height: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Herzlich willkommen!</h2>
+
+    <div>Teilen Sie uns bitte mit, woher Sie kommen.</div>
+<br>
+
+    <!-- <input id="name" placeholder="Name" /> -->
+
+    <div class="dropdown">
+        <input id="countrySearch" class="dropdown-input" placeholder="Ich komme aus..." />
+        <div id="countryList" class="dropdown-list"></div>
+    </div>
+
+    <br><br>
+
+    <label for="district">Ich wohne in:</label>
+    <select id="district">
+        <option value="Eichen" selected>Eichen</option>
+        <option value="Erbstadt">Erbstadt</option>
+        <option value="Heldenbergen">Heldenbergen</option>
+        <option value="Ostheim">Ostheim</option>
+        <option value="Windecken">Windecken</option>
+        <option value="Woanders">Woanders</option>
+    </select>
+
+
+    <br><br>
+
+    <button onclick="saveGuest()">OK</button>
+
+    <p id="status"></p>
+
+    <!-- 
+    <div id="devId_temp" style="font-size:12px;color:#d5d4d4;"></div>
+    <div id="regNum_temp" style="font-size:12px;color:#d5d4d4;"></div>
+    -->
+
+    <!-- 🔔 Кастомное модальное окно (замена alert()) -->
+    <div id="customModalOverlay" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div id="customModalMessage" class="custom-modal-message"></div>
+            <button id="customModalOkBtn">OK</button>
+        </div>
+    </div>
+
+    <!-- 🎉 Оверлей "Herzlich willkommen" после успешной регистрации -->
+    <div id="welcomeOverlay" class="welcome-overlay">
+        <div class="willkommen">HERZLICH WILLKOMMEN!</div>
+        <div id="welcomeCountry" class="wCountry"></div>
+        <div id="welcomeFlag" class="test-flag"></div>
+    </div>
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+        // =====================
+        // ⏱️ НАСТРОЙКА ПОВТОРНОЙ РЕГИСТРАЦИИ С ОДНОГО УСТРОЙСТВА
+        // =====================
+        // Единственное место в коде, где нужно менять время "остывания":
+        // через сколько секунд после последней регистрации с этого устройства
+        // разрешена следующая регистрация.
+        const REGISTRATION_COOLDOWN_SECONDS = 15;
+        // Ключ, под которым ID устройства хранится в localStorage браузера
+        const DEVICE_ID_STORAGE_KEY = "festDeviceId";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2TQLu_O5U-Jjxj1ArV4Cn79mtjp9cI9k",
+            authDomain: "vielfaltfestv2.firebaseapp.com",
+            projectId: "vielfaltfestv2",
+            storageBucket: "vielfaltfestv2.firebasestorage.app",
+            messagingSenderId: "657334897151",
+            appId: "1:657334897151:web:f1651bca7dc22f250d3fca"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Переменная для хранения списка стран
+        let countries = [];
+
+        // Функция загрузки данных
+        async function loadCountries() {
+            try {
+                const response = await fetch('countries.json');
+                countries = await response.json();
+            } catch (e) {
+                console.error("Ошибка при загрузке списка стран:", e);
+            }
+        }
+
+        // Запускаем загрузку при старте
+        loadCountries();
+
+        // =====================
+        // 🐞 ВРЕМЕННАЯ ОТЛАДКА: показываем deviceId и последний regNum на странице
+        // =====================
+        async function showDeviceDebugInfo() {
+            let deviceId = null;
+            try {
+                deviceId = localStorage.getItem(DEVICE_ID_STORAGE_KEY);
+            } catch (e) {
+                console.warn("localStorage nicht verfügbar:", e);
+                deviceId = null;
+            }
+
+            const devIdEl = document.getElementById("devId_temp");
+            const regNumEl = document.getElementById("regNum_temp");
+
+            if (devIdEl) devIdEl.textContent = `deviceId: ${deviceId}`;
+
+            if (!deviceId) {
+                if (regNumEl) regNumEl.textContent = "regNum: 0";
+                return;
+            }
+
+            try {
+                const q = query(
+                    collection(db, "guests"),
+                    where("deviceId", "==", deviceId),
+                    orderBy("createdAt", "desc"),
+                    limit(1)
+                );
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    if (regNumEl) regNumEl.textContent = "regNum: 0";
+                    return;
+                }
+
+                const lastGuest = snapshot.docs[0].data();
+                const regNum = lastGuest.registrationCount || 0;
+                if (regNumEl) regNumEl.textContent = `regNum: ${regNum}`;
+
+            } catch (e) {
+                console.error("Fehler beim Laden der regNum-Debuginfo:", e);
+                if (regNumEl) regNumEl.textContent = "regNum: 0";
+            }
+        }
+
+        showDeviceDebugInfo();
+
+        // 🇺🇳 emoji-флаг
+        function flag(alpha2) {
+            return alpha2
+                .toUpperCase()
+                .replace(/./g, c =>
+                    String.fromCodePoint(127397 + c.charCodeAt())
+                );
+        }
+
+        // =====================
+        // 🔍 DROPDOWN LOGIC
+        // =====================
+        const search = document.getElementById("countrySearch");
+        const list = document.getElementById("countryList");
+        let selectedCountry = null;
+
+        function renderList(filter = "") {
+            list.innerHTML = "";
+            const filtered = countries.filter(c =>
+                (c.de + c.en + c.alpha3)
+                    .toLowerCase()
+                    .includes(filter.toLowerCase())
+            );
+
+            filtered.forEach(c => {
+                const div = document.createElement("div");
+                div.className = "dropdown-item";
+                div.textContent = `${flag(c.alpha2)} ${c.alpha3} — ${c.de} (${c.en})`;
+                div.onclick = () => {
+                    search.value = div.textContent;
+                    selectedCountry = c.alpha3;
+                    list.style.display = "none";
+                };
+                list.appendChild(div);
+            });
+
+            list.style.display = filtered.length ? "block" : "none";
+        }
+
+        // Обработчик input
+        search.addEventListener("input", () => renderList(search.value));
+
+        // Обработчик click для открытия/очистки
+        search.addEventListener("click", () => {
+            search.value = "";
+            selectedCountry = null;
+            renderList("");
+        });
+
+        // Закрытие при клике вне области
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".dropdown")) {
+                list.style.display = "none";
+            }
+        });
+
+        // Генерирует ID устройства. crypto.randomUUID() требует "безопасного контекста"
+        // (https:// или localhost) — если страница открыта по обычному http:// через
+        // IP-адрес в локальной сети (как часто бывает при тестировании с телефона через
+        // Live Server), эта функция недоступна и выбрасывает ошибку. В таком случае
+        // используем простой резервный генератор — для отслеживания устройства
+        // криптографическая стойкость ID не требуется, достаточно разумной уникальности.
+        function generateDeviceId() {
+            if (window.crypto && typeof window.crypto.randomUUID === "function") {
+                try {
+                    return window.crypto.randomUUID();
+                } catch (e) {
+                    console.warn("crypto.randomUUID() nicht verfügbar (kein sicherer Kontext), verwende Fallback:", e);
+                }
+            }
+            return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === "x" ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // 🔔 Показывает кастомное модальное окно вместо alert().
+        // Возвращает Promise, который разрешается при нажатии OK —
+        // так же, как обычный alert(), можно использовать с await.
+        function showCustomAlert(message) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById("customModalOverlay");
+                const messageEl = document.getElementById("customModalMessage");
+                const okBtn = document.getElementById("customModalOkBtn");
+
+                messageEl.textContent = message;
+                overlay.classList.add("visible");
+
+                function onOk() {
+                    overlay.classList.remove("visible");
+                    okBtn.removeEventListener("click", onOk);
+                    resolve();
+                }
+                okBtn.addEventListener("click", onOk);
+            });
+        }
+
+        // 🎉 Показывает оверлей "Herzlich willkommen" с названием страны и флагом
+        // на 4 секунды — тот же вид, что и на главном экране карты (map4.html).
+        // Возвращает Promise, который разрешается по истечении 4 секунд.
+        function showWelcomeOverlay(countryAlpha3) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById("welcomeOverlay");
+                const countryEl = document.getElementById("welcomeCountry");
+                const flagEl = document.getElementById("welcomeFlag");
+
+                const countryInfo = countries.find(c => c.alpha3 === countryAlpha3);
+                countryEl.textContent = countryInfo ? countryInfo.de : "";
+                flagEl.textContent = countryInfo ? flag(countryInfo.alpha2) : "";
+
+                overlay.classList.add("visible");
+
+                // Оверлей НЕ скрываем здесь: сразу после разрешения промиса
+                // происходит редирект на danke.html — точно такой же по виду
+                // экран, так что переход получается визуально бесшовным,
+                // без "мигания" исходной формы на долю секунды.
+                setTimeout(() => {
+                    resolve();
+                }, 4000);
+            });
+        }
+
+        // =====================
+        // 💾 SAVE
+        // =====================
+        window.saveGuest = async function () {
+            const district = document.getElementById("district").value;
+
+            if (!selectedCountry) {
+                await showCustomAlert("Wählen Sie bitte ein Land aus der Liste");
+                return;
+            }
+
+            // 🆔 Пытаемся получить (или создать) ID устройства через localStorage.
+            // Если localStorage недоступен (приватный режим, отключено в настройках
+            // браузера и т.п.) — считаем это первой регистрацией без отслеживания
+            // устройства, ничего не блокируем.
+            let deviceId = null;
+            let isNewDevice = false;
+            try {
+                deviceId = localStorage.getItem(DEVICE_ID_STORAGE_KEY);
+                if (!deviceId) {
+                    deviceId = generateDeviceId();
+                    localStorage.setItem(DEVICE_ID_STORAGE_KEY, deviceId);
+                    isNewDevice = true;
+                }
+            } catch (e) {
+                console.warn("localStorage nicht verfügbar, Registrierung ohne Geräteverfolgung:", e);
+                deviceId = null;
+            }
+
+            // 🔍 Диагностика: покажет в консоли браузера (F12), что реально получилось
+            console.log("[Diagnose] deviceId =", deviceId, "| isNewDevice =", isNewDevice, "| Seiten-URL =", window.location.href);
+
+            // Если ID устройства только что создан (или localStorage недоступен) —
+            // это точно первая регистрация с этого устройства, проверять Firebase не нужно
+            if (!deviceId || isNewDevice) {
+                await registerGuest(district, deviceId, 1);
+                return;
+            }
+
+            // ID уже был сохранён ранее — ищем в Firebase последнюю регистрацию с этим ID
+            try {
+                const q = query(
+                    collection(db, "guests"),
+                    where("deviceId", "==", deviceId),
+                    orderBy("createdAt", "desc"),
+                    limit(1)
+                );
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    // ID есть в localStorage, но в Firebase записей с ним нет
+                    // (например, база была очищена) — регистрируем как первую
+                    await registerGuest(district, deviceId, 1);
+                    return;
+                }
+
+                const lastGuest = snapshot.docs[0].data();
+                const lastTime = lastGuest.createdAt.toDate
+                    ? lastGuest.createdAt.toDate()
+                    : new Date(lastGuest.createdAt);
+                const secondsSinceLast = (Date.now() - lastTime.getTime()) / 1000;
+
+                if (secondsSinceLast < REGISTRATION_COOLDOWN_SECONDS) {
+                    const retryAt = new Date(lastTime.getTime() + REGISTRATION_COOLDOWN_SECONDS * 1000);
+                    const timeStr = retryAt.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+                    await showCustomAlert(`Sie haben sich bereits registriert. Bitte versuchen Sie es um ${timeStr} erneut.`);
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                // Остывание прошло — регистрируем, счётчик = счётчик прошлой записи + 1
+                const nextCount = (lastGuest.registrationCount || 1) + 1;
+                await registerGuest(district, deviceId, nextCount);
+
+            } catch (e) {
+                console.error("Fehler bei der Geräteprüfung:", e);
+                // Не удалось проверить Firebase (например, нет сети) —
+                // гостя не блокируем, регистрируем как обычно
+                await registerGuest(district, deviceId, 1);
+            }
+        };
+
+        // Общая функция записи гостя в Firebase — вызывается из всех веток выше,
+        // чтобы формат записи не расходился между сценариями
+        async function registerGuest(district, deviceId, registrationCount) {
+            // Генерируем уникальное имя на основе текущего времени
+            const now = new Date();
+            const pad = (num) => String(num).padStart(2, '0');
+            const name = `guest-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+
+            const guestData = {
+                name,
+                country: selectedCountry,
+                district,
+                createdAt: new Date(),
+                registrationCount
+            };
+            if (deviceId) {
+                guestData.deviceId = deviceId;
+            }
+
+            try {
+                await addDoc(collection(db, "guests"), guestData);
+                document.getElementById("status").innerText = "Gespeichert. Danke!";
+                search.value = "";
+                await showWelcomeOverlay(selectedCountry);
+                // Редирект на постоянный экран благодарности (не index.html) —
+                // при обновлении страницы гость останется на нём и не получит
+                // прямого доступа обратно к форме регистрации.
+                window.location.href = `danke.html?country=${encodeURIComponent(selectedCountry)}`;
+            } catch (e) {
+                console.error(e);
+                document.getElementById("status").innerText = "Fehler!";
+            }
+        }
+    </script>
+    <!--
+    <a href="map4.html" style="color: #d5d4d4">Map 1</a>
+    <br>
+    <a href="map5.html" style="color: #d5d4d4">Map 2</a>
+    <br>
+    <a href="index.html" style="color: #d5d4d4">index</a>
+    -->
+</body>
+
+</html>
