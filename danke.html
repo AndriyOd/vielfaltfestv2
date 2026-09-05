@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herzlich willkommen</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #ffffffd9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Те же классы и размеры, что и у .welcome-overlay в mitteilen.html —
+           чтобы переход со страницы регистрации выглядел бесшовно,
+           без визуальных отличий для гостя. */
+        .willkommen {
+            font-size: clamp(1.4rem, 6.5vw, 2.4rem);
+            color: rgb(68, 68, 68);
+            font-weight: bold;
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin-bottom: 14px;
+        }
+
+        .wCountry {
+            font-size: clamp(1.1rem, 5vw, 1.9rem);
+            color: rgb(68, 68, 68);
+            font-weight: bold;
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin-bottom: 14px;
+        }
+
+        .test-flag {
+            font-size: clamp(4rem, 24vw, 7.5rem);
+            line-height: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="willkommen">HERZLICH WILLKOMMEN!</div>
+    <div id="welcomeCountry" class="wCountry"></div>
+    <div id="welcomeFlag" class="test-flag"></div>
+
+    <script type="module">
+        // Та же функция генерации флага-эмодзи, что и в mitteilen.html
+        function flag(a2) {
+            return String.fromCodePoint(...[...a2.toUpperCase()].map(c => c.charCodeAt(0) + 127397));
+        }
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const countryAlpha3 = params.get("country");
+
+            const countryEl = document.getElementById("welcomeCountry");
+            const flagEl = document.getElementById("welcomeFlag");
+
+            if (!countryAlpha3) return;
+
+            try {
+                const response = await fetch('countries.json');
+                const countries = await response.json();
+                const countryInfo = countries.find(c => c.alpha3 === countryAlpha3);
+                if (countryInfo) {
+                    countryEl.textContent = countryInfo.de;
+                    flagEl.textContent = flag(countryInfo.alpha2);
+                }
+            } catch (e) {
+                console.error("Fehler beim Laden der Länder:", e);
+            }
+        }
+
+        // Эта страница намеренно НИЧЕГО больше не делает: ни таймера,
+        // ни редиректа. При обновлении страницы гость снова видит
+        // тот же самый экран — и не имеет прямого пути обратно к форме.
+        init();
+    </script>
+</body>
+
+</html>
